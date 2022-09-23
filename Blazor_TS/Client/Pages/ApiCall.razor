@@ -1,0 +1,45 @@
+﻿@page "/apicall"
+@inject HttpClient Http
+
+<h1>Call web API from a Blazor Server Razor component</h1>
+
+@if (!showInfo)
+{
+    <p>Unable to get information. Please try again later.</p>
+}
+else
+{
+    <ul>
+
+    </ul>
+}
+
+@code {
+    private bool showInfo;
+    private bool shouldRender;
+
+    protected override bool ShouldRender() => shouldRender;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var client = new HttpClient())
+        {
+            client.BaseAddress = new Uri("https://api.zippopotam.us/us/33162");
+            client.DefaultRequestHeaders.Clear();
+            var response = await client.GetAsync(client.BaseAddress);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = response.Content.ReadAsStringAsync().Result;
+                showInfo = true;
+                Console.WriteLine(result);
+            }
+            else
+            {
+                showInfo = false;
+            }
+        }
+        shouldRender = true;
+        showInfo = false;
+    }
+
+}
